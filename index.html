@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell Your Livestock</title>
     <style>
-        /* Your CSS from before */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
         .container { background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
@@ -40,19 +39,19 @@
         <h2>Sell Your Livestock Online</h2>
         <form id="livestockForm" enctype="multipart/form-data">
             <label for="farmerName">Your Name:</label>
-            <input type="text" id="farmerName" name="farmerName" required>
+            <input type="text" id="farmerName" name="farmer_name" required>
 
             <label for="farmerPhone">Your Phone Number (e.g., +919876543210):</label>
-            <input type="tel" id="farmerPhone" name="farmerPhone" pattern="^\+\d{10,15}$" placeholder="+91..." required>
+            <input type="tel" id="farmerPhone" name="farmer_phone" pattern="^\+\d{10,15}$" placeholder="+91..." required>
 
             <label for="animalAge">Animal's Age (in years):</label>
-            <input type="number" id="animalAge" name="animalAge" min="0" required>
+            <input type="number" id="animalAge" name="animal_age" min="0" required>
 
             <label for="milkYield">Daily Milk Yield (liters):</label>
-            <input type="number" id="milkYield" name="milkYield" step="0.1" min="0" required>
+            <input type="number" id="milkYield" name="milk_yield" step="0.1" min="0" required>
 
             <label for="animalPhoto">Upload Photo of Animal:</label>
-            <input type="file" id="animalPhoto" name="animalPhoto" accept="image/*" required>
+            <input type="file" id="animalPhoto" name="animal_photo" accept="image/*" required>
 
             <input type="submit" value="Submit Listing">
         </form>
@@ -62,14 +61,12 @@
     <script>
         const form = document.getElementById('livestockForm');
         const responseMessageDiv = document.getElementById('responseMessage');
-        // REPLACE THIS WITH YOUR ACTUAL N8N WEBHOOK URL
 
-        const n8nWebhookUrl = 'https://shubhamvharamble28.app.n8n.cloud/webhook-test/e959d604-9035-4291-9d28-2e45398997be'; 
-
+        // ✅ Replace with your n8n webhook URL
+        const n8nWebhookUrl = 'https://shubhamvharamble28.app.n8n.cloud/webhook/e959d604-9035-4291-9d28-2e45398997be'; 
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
-
             const formData = new FormData(form);
 
             try {
@@ -79,18 +76,19 @@
                 });
 
                 if (response.ok) {
-                    responseMessageDiv.textContent = 'Your listing has been submitted successfully! We will process it shortly.';
+                    responseMessageDiv.textContent = 'Your listing has been submitted successfully!';
                     responseMessageDiv.className = 'message success';
                     form.reset();
                 } else {
                     const errorText = await response.text();
-                    responseMessageDiv.textContent = `Error submitting listing: ${errorText || response.statusText}. Please try again.`;
+                    responseMessageDiv.textContent = `Error submitting listing: ${errorText || response.statusText}`;
                     responseMessageDiv.className = 'message error';
                 }
             } catch (error) {
-                responseMessageDiv.textContent = `Network error: ${error.message}. Please check your connection.`;
+                responseMessageDiv.textContent = `Network error: ${error.message}`;
                 responseMessageDiv.className = 'message error';
             }
+
             responseMessageDiv.style.display = 'block';
         });
     </script>
