@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1f2937; /* Dark gray */
+            color: #e5e7eb; /* Light gray text */
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar a {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+        .sidebar a:hover {
+            background-color: #374151; /* Slightly lighter dark gray on hover */
+        }
+        .sidebar a.active {
+            background-color: #4b5563; /* Even lighter for active state */
+            font-weight: 600;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            min-width: 800px; /* Ensure table doesn't shrink too much */
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <aside class="sidebar flex flex-col items-start">
+        <h1 class="text-2xl font-bold mb-8 text-white">Livestock App</h1>
+        <nav class="w-full">
+            <a href="index.html" class="flex items-center space-x-2 text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Add Listing</span>
+            </a>
+            <a href="dashboard.html" class="flex items-center space-x-2 text-lg active">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 2v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Dashboard</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Livestock Listings Dashboard</h2>
+
+        <div class="table-container bg-white shadow-md rounded-lg p-6">
+            <table class="w-full table-auto border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left border-b border-gray-200">ID</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Farmer Name</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Phone</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Age (Years)</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Milk Yield (L/day)</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Image</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">AI Analysis</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Price Suggestion</th>
+                        <th class="py-3 px-6 text-left border-b border-gray-200">Listed On</th>
+                    </tr>
+                </thead>
+                <tbody id="livestockTableBody" class="text-gray-700 text-sm font-light">
+                    <!-- Data will be loaded here by JavaScript -->
+                    <tr>
+                        <td colspan="9" class="py-4 px-6 text-center">Loading livestock data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // IMPORTANT: Replace with your n8n Webhook URL for fetching data
+        const n8nDashboardWebhookUrl = 'https://shubhamvharamble28.app.n8n.cloud/webhook-test/75309632-462b-4ac1-af9c-5e1aad6714ca'; 
+
+        document.addEventListener('DOMContentLoaded', fetchLivestockData);
+
+        async function fetchLivestockData() {
+            const tableBody = document.getElementById('livestockTableBody');
+            tableBody.innerHTML = '<tr><td colspan="9" class="py-4 px-6 text-center">Loading livestock data...</td></tr>'; // Loading message
+
+            try {
+                const response = await fetch(n8nDashboardWebhookUrl, {
+                    method: 'GET', // Dashboard fetches data using GET
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    tableBody.innerHTML = ''; // Clear loading message
+                    data.forEach(item => {
+                        const row = `
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="py-3 px-6 text-left whitespace-nowrap">${item.id}</td>
+                                <td class="py-3 px-6 text-left">${item.farmer_name}</td>
+                                <td class="py-3 px-6 text-left">${item.farmer_phone || 'N/A'}</td>
+                                <td class="py-3 px-6 text-left">${item.animal_age || 'N/A'}</td>
+                                <td class="py-3 px-6 text-left">${item.milk_yield || 'N/A'}</td>
+                                <td class="py-3 px-6 text-left">
+                                    ${item.image_url ? `<a href="${item.image_url}" target="_blank" class="text-blue-500 hover:underline">View Image</a>` : 'N/A'}
+                                </td>
+                                <td class="py-3 px-6 text-left">${item.ai_analysis || 'N/A'}</td>
+                                <td class="py-3 px-6 text-left">${item.price_suggestion ? `$${item.price_suggestion.toFixed(2)}` : 'N/A'}</td>
+                                <td class="py-3 px-6 text-left">${new Date(item.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="9" class="py-4 px-6 text-center">No livestock listings found.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('Error fetching livestock data:', error);
+                tableBody.innerHTML = `<tr><td colspan="9" class="py-4 px-6 text-center text-red-500">Error loading data: ${error.message}. Check console for details.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
